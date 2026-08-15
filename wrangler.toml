@@ -1,0 +1,12 @@
+name = "beeftrace-web"
+compatibility_date = "2026-08-15"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+# Environment variables used by app/api/contact/route.ts.
+# Set the real values with:
+#   npx wrangler pages secret put RESEND_API_KEY
+#   npx wrangler pages secret put CONTACT_TO_EMAIL
+#   npx wrangler pages secret put CONTACT_FROM_EMAIL
+# or add them in the Cloudflare dashboard under
+# Workers & Pages > beeftrace-web > Settings > Environment Variables.

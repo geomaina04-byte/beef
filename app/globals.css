@@ -1,0 +1,76 @@
+@import "../theme/variables.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+/* grain overlay, fixed over entire viewport, non-interactive */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: url("/noise.png");
+  background-size: 220px;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  /* Hero is the one section that should read completely clean — fade
+     the grain out for roughly its height, keep it everywhere else. */
+  mask-image: linear-gradient(to bottom, transparent 0, transparent 95vh, black 95vh);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 95vh, black 95vh);
+}
+
+.eyebrow {
+  font-family: var(--font-plex-mono), monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.section-pad {
+  padding-top: clamp(4.5rem, 9vw, 8.5rem);
+  padding-bottom: clamp(4.5rem, 9vw, 8.5rem);
+}
+
+.container-lux {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding-left: clamp(1.25rem, 4vw, 3rem);
+  padding-right: clamp(1.25rem, 4vw, 3rem);
+}
+
+.hairline {
+  background: linear-gradient(90deg, transparent, rgba(212, 166, 87, 0.5), transparent);
+  height: 1px;
+}
+
+.seal-glow {
+  filter: drop-shadow(0 0 18px rgba(212, 166, 87, 0.35));
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeefTrace — Team Guide</title>
+<style>
+  :root {
+    --charcoal: #0B0A09;
+    --charcoal-soft: #131110;
+    --charcoal-raised: #1B1815;
+    --maroon: #6B1418;
+    --maroon-bright: #8C1D22;
+    --gold: #D4A657;
+    --gold-soft: #E9C783;
+    --cream: #F5EFE6;
+    --cream-dim: #C9C1B4;
+    --emerald: #2F6F4E;
+    --emerald-bright: #3E9468;
+    --stone: #8A8580;
+    --border: rgba(245,239,230,0.1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--charcoal);
+    color: var(--cream);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Arial, sans-serif;
+    line-height: 1.65;
+  }
+  a { color: var(--gold-soft); }
+  code, pre {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  code {
+    background: var(--charcoal-raised);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 0.88em;
+    color: var(--gold-soft);
+  }
+  pre {
+    background: var(--charcoal-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 0.86em;
+    line-height: 1.55;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--cream);
+  }
+
+  /* Layout */
+  .wrap {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  @media (max-width: 880px) {
+    .wrap { grid-template-columns: 1fr; }
+    nav.toc { display: none; }
+  }
+
+  /* Header */
+  header.hero {
+    padding: 56px 32px 40px;
+    border-bottom: 1px solid var(--border);
+    background:
+      radial-gradient(circle at 15% 20%, rgba(107,20,24,0.35), transparent 55%),
+      radial-gradient(circle at 85% 10%, rgba(212,166,87,0.12), transparent 45%);
+  }
+  header.hero .eyebrow {
+    font-family: monospace;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 11px;
+    color: var(--emerald-bright);
+    margin: 0 0 14px;
+  }
+  header.hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(28px, 4vw, 42px);
+    letter-spacing: -0.01em;
+  }
+  header.hero h1 span { color: var(--gold-soft); }
+  header.hero p.lead {
+    max-width: 640px;
+    color: var(--cream-dim);
+    font-size: 16px;
+    margin: 0;
+  }
+  .badge-row { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    border: 1px solid var(--border);
+    background: rgba(245,239,230,0.03);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--cream-dim);
+  }
+
+  /* Sidebar TOC */
+  nav.toc {
+    padding: 40px 20px;
+    border-right: 1px solid var(--border);
+    align-self: start;
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  nav.toc .toc-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--stone);
+    margin: 0 0 14px 10px;
+  }
+  nav.toc a {
+    display: block;
+    padding: 7px 10px;
+    border-radius: 8px;
+    color: var(--cream-dim);
+    text-decoration: none;
+    font-size: 13.5px;
+    margin-bottom: 2px;
+  }
+  nav.toc a:hover { background: var(--charcoal-raised); color: var(--cream); }
+  nav.toc a.num { color: var(--gold-soft); font-family: monospace; font-size: 12px; margin-right: 6px; }
+
+  /* Main content */
+  main { padding: 40px 40px 100px; min-width: 0; }
+  @media (max-width: 880px) { main { padding: 32px 20px 80px; } }
+
+  section.block {
+    margin-bottom: 64px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  section.block:first-child { border-top: none; }
+
+  .kicker {
+    font-family: monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin: 0 0 8px;
+  }
+  h2 {
+    font-size: 26px;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  h2 .step-num {
+    font-family: monospace;
+    color: var(--stone);
+    font-size: 16px;
+  }
+  h3 { font-size: 18px; margin: 28px 0 10px; color: var(--gold-soft); }
+  p { color: var(--cream-dim); margin: 10px 0; }
+  strong { color: var(--cream); }
+  ul, ol { color: var(--cream-dim); padding-left: 22px; }
+  li { margin: 6px 0; }
+  li strong { color: var(--cream); }
+
+  .callout {
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin: 18px 0;
+    border: 1px solid var(--border);
+    font-size: 14.5px;
+  }
+  .callout.tip { background: rgba(62,148,104,0.08); border-color: rgba(62,148,104,0.25); }
+  .callout.tip .label { color: var(--emerald-bright); }
+  .callout.warn { background: rgba(212,166,87,0.08); border-color: rgba(212,166,87,0.25); }
+  .callout.warn .label { color: var(--gold-soft); }
+  .callout.danger { background: rgba(140,29,34,0.1); border-color: rgba(140,29,34,0.35); }
+  .callout.danger .label { color: #E28A8D; }
+  .callout .label {
+    display: block;
+    font-family: monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .callout p { margin: 0; color: var(--cream); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { color: var(--gold-soft); font-family: monospace; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; }
+  td { color: var(--cream-dim); }
+  td strong, td code { color: var(--cream); }
+
+  .swatch-row { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0; }
+  .swatch { width: 130px; }
+  .swatch .chip { height: 56px; border-radius: 10px; border: 1px solid var(--border); }
+  .swatch .name { font-size: 12.5px; margin-top: 6px; color: var(--cream); font-weight: 600; }
+  .swatch .hex { font-family: monospace; font-size: 11px; color: var(--stone); }
+
+  .file-tree {
+    background: var(--charcoal-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--cream-dim);
+    line-height: 1.9;
+  }
+  .file-tree .folder { color: var(--gold-soft); }
+  .file-tree .comment { color: var(--stone); }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .mini-card {
+    border: 1px solid var(--border);
+    background: var(--charcoal-raised);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .mini-card .route {
+    font-family: monospace;
+    color: var(--emerald-bright);
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .mini-card p { margin: 0; font-size: 13.5px; }
+
+  .step {
+    display: flex;
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .step .n {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--charcoal-raised);
+    border: 1px solid var(--gold);
+    color: var(--gold-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-family: monospace; font-size: 12.5px;
+  }
+  .step .content { padding-top: 2px; }
+  .step .content p { margin: 4px 0 0; }
+
+  footer.doc-footer {
+    padding: 40px;
+    text-align: center;
+    color: var(--stone);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--charcoal); }
+  ::-webkit-scrollbar-thumb { background: var(--charcoal-raised); border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">● Internal documentation — not for public sharing</p>
+  <h1>BeefTrace — <span>Team Guide</span></h1>
+  <p class="lead">
+    This is a walkthrough of how the BeefTrace website is built, where everything lives,
+    and how to make common changes safely — written for teammates who haven't worked in
+    this codebase before. If a term is unfamiliar, it's explained the first time it shows up.
+  </p>
+  <div class="badge-row">
+    <span class="badge">Next.js + TypeScript</span>
+    <span class="badge">Tailwind CSS</span>
+    <span class="badge">Framer Motion + GSAP</span>
+    <span class="badge">6 pages · 34 components</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc">
+    <p class="toc-title">Contents</p>
+    <a href="#start"><span class="num">01</span>Getting the site running</a>
+    <a href="#map"><span class="num">02</span>How the project is organized</a>
+    <a href="#pages"><span class="num">03</span>The pages, one by one</a>
+    <a href="#loading"><span class="num">04</span>The two loading screens</a>
+    <a href="#brand"><span class="num">05</span>Branding &amp; the design system</a>
+    <a href="#team-page"><span class="num">06</span>Updating the Team page</a>
+    <a href="#contact-info"><span class="num">07</span>Updating contact details</a>
+    <a href="#media"><span class="num">08</span>Images &amp; videos</a>
+    <a href="#tasks"><span class="num">09</span>Common tasks, step by step</a>
+    <a href="#checks"><span class="num">10</span>Checking your work before sharing</a>
+    <a href="#glossary"><span class="num">11</span>Glossary of terms</a>
+    <a href="#help"><span class="num">12</span>If something breaks</a>
+  </nav>
+
+  <main>
+
+    <section class="block" id="start">
+      <p class="kicker">Section 01</p>
+      <h2><span class="step-num">01</span> Getting the site running on your own computer</h2>
+      <p>
+        This project is a <strong>Next.js</strong> website. Next.js is a framework (a set of
+        tools) built on top of <strong>React</strong>, which is what most modern websites are
+        built with. You don't need to understand React deeply to make small changes — this
+        guide will point you to exactly which file to open for most tasks.
+      </p>
+
+      <h3>What you need installed first</h3>
+      <ul>
+        <li><strong>Node.js</strong> (version 18 or newer) — this is what runs the project on your computer. Download it from <a href="https://nodejs.org" target="_blank">nodejs.org</a> if you don't have it.</li>
+        <li>A code editor — <strong>VS Code</strong> is the standard choice and is free.</li>
+      </ul>
+
+      <h3>Steps to run the site locally</h3>
+      <div class="step">
+        <div class="n">1</div>
+        <div class="content">
+          <strong>Unzip the project folder</strong> and open it in VS Code (or open a terminal inside it).
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div class="content">
+          <strong>Install the project's dependencies</strong> — these are all the outside code
+          libraries the site relies on (like the animation libraries). Run this once:
+          <pre><code>npm install</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div class="content">
+          <strong>Start the local development server</strong>:
+          <pre><code>npm run dev</code></pre>
+          Then open <code>http://localhost:3000</code> in your browser. The site will reload
+          automatically every time you save a file.
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="label">Tip</span>
+        <p>Keep the terminal window open while you work — it shows errors immediately if something you typed breaks the code, usually with a clear message and a file name.</p>
+      </div>
+
+      <h3>Other useful commands</h3>
+      <table>
+        <tr><th>Command</th><th>What it does</th></tr>
+        <tr><td><code>npm run dev</code></td><td>Runs the site locally so you can see your changes as you work.</td></tr>
+        <tr><td><code>npm run build</code></td><td>Builds the production version of the site and checks for errors (missing files, typos in code, etc). <strong>Always run this before sending changes to anyone</strong> — if it fails, something needs fixing first.</td></tr>
+        <tr><td><code>npm run lint</code></td><td>Checks the code for style issues and common mistakes.</td></tr>
+      </table>
+    </section>
+
+    <section class="block" id="map">
+      <p class="kicker">Section 02</p>
+      <h2><span class="step-num">02</span> How the project is organized</h2>
+      <p>Three folders matter most. Everything else is configuration you shouldn't need to touch.</p>
+
+      <div class="file-tree">
+<span class="folder">app/</span>          <span class="comment">— one folder per page (this is what creates the URLs)</span><br>
+<span class="folder">components/</span>   <span class="comment">— reusable building blocks that pages are made of</span><br>
+<span class="folder">public/</span>       <span class="comment">— every image, video, and downloadable file</span><br>
+<span class="folder">lib/</span>          <span class="comment">— small shared helper files (e.g. the team roster data)</span><br>
+      </div>
+
+      <h3>The golden rule</h3>
+      <div class="callout warn">
+        <span class="label">Important</span>
+        <p>In Next.js, a folder inside <code>app/</code> becomes a real web address. For example,
+        <code>app/about/page.tsx</code> is what you see at <code>beeftrace.co.ke/about</code>.
+        If you want a new page, you create a new folder in <code>app/</code> with a <code>page.tsx</code> file inside it — you don't need to register it anywhere else.</p>
+      </div>
+
+      <h3>What "components" means</h3>
+      <p>
+        Instead of writing one giant file for a whole page, the page is assembled from smaller
+        pieces — a <code>Nav</code> component (the top menu), a <code>Footer</code> component,
+        a <code>Hero</code> component (the big opening section), and so on. Each piece lives in
+        its own file in <code>components/</code>. A page file like <code>app/page.tsx</code> is
+        mostly just a list of which components to stack on that page, in order.
+      </p>
+    </section>
+
+    <section class="block" id="pages">
+      <p class="kicker">Section 03</p>
+      <h2><span class="step-num">03</span> The pages, one by one</h2>
+      <p>These are the six pages that currently exist on the site:</p>
+
+      <div class="card-grid">
+        <div class="mini-card">
+          <span class="route">/  →  app/page.tsx</span>
+          <p>The homepage. Hero, the problem/solution story, "How it works", platform preview, the mid-page video section, stats, and the final call-to-action.</p>
+        </div>
+        <div class="mini-card">
+          <span class="route">/technology  →  app/technology/page.tsx</span>
+          <p>Deep dive into the tech: the architecture diagram, the 7 system "pillars" (QR, blockchain, GPS, etc.), and the compliance section.</p>
+        </div>
+        <div class="mini-card">
+          <span class="route">/about  →  app/about/page.tsx</span>
+          <p>Mission, vision, company timeline, core values, and the "where we are" impact section.</p>
+        </div>
+        <div class="mini-card">
+          <span class="route">/team  →  app/team/page.tsx</span>
+          <p>The team roster with searchable profile cards. See Section 06 — this is one you'll likely update often.</p>
+        </div>
+        <div class="mini-card">
+          <span class="route">/contact  →  app/contact/page.tsx</span>
+          <p>Contact form, office hours, map, and the FAQ. See Section 07 for updating the details shown here.</p>
+        </div>
+        <div class="mini-card">
+          <span class="route">/demo  →  app/demo/page.tsx</span>
+          <p>"Book a Demo" request form. Every "Book a Demo" button on the site links here.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="loading">
+      <p class="kicker">Section 04</p>
+      <h2><span class="step-num">04</span> The two loading screens (easy to mix up)</h2>
+      <p>There are <strong>two different</strong> loading effects on the site. They look similar but do different jobs — it's worth understanding the difference before touching either one.</p>
+
+      <h3>1. The intro screen — <code>components/BootIntro.tsx</code></h3>
+      <p>
+        This is the full, cinematic loading screen with the video, the glowing logo card, and
+        the "Skip" button. It only plays <strong>once per visit</strong> — the first time
+        someone opens the site in a browser tab. It uses the browser's <code>sessionStorage</code>
+        to remember it's already been shown, so refreshing the page or clicking to another page
+        won't show it again until the browser tab is closed and reopened.
+      </p>
+
+      <h3>2. The page-transition screen — <code>components/TransitionOverlay.tsx</code></h3>
+      <p>
+        This is the short (roughly half a second) screen with the logo and a thin progress line
+        that appears <strong>every time</strong> someone clicks a link to go from one page to
+        another (e.g. Home → Technology). It's controlled by two other files working together:
+      </p>
+      <ul>
+        <li><code>lib/transition-context.tsx</code> — keeps track of whether a transition is currently happening.</li>
+        <li><code>components/RouteTransitionListener.tsx</code> — silently watches every click on the page. If it's a link to another page on this site, it steps in, plays the loading animation, then completes the navigation.</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="label">Why it's built this way</span>
+        <p>Because <code>RouteTransitionListener</code> watches <em>all</em> clicks automatically, you don't need to do anything special when adding a new link or button — the transition screen will just work on it. You never need to manually wrap a link in anything.</p>
+      </div>
+
+      <div class="callout danger">
+        <span class="label">Be careful</span>
+        <p>If you ever need to change how long the intro screen (<code>BootIntro.tsx</code>) stays on screen, search that file for the word <code>minDuration</code> — that's the number (in milliseconds; 1000 = 1 second) controlling the minimum time it stays visible. It's currently set quite long (20 seconds) — worth a second look, since that's a long wait before a first-time visitor sees any real content.</p>
+      </div>
+    </section>
+
+    <section class="block" id="brand">
+      <p class="kicker">Section 05</p>
+      <h2><span class="step-num">05</span> Branding &amp; the design system</h2>
+
+      <h3>The logo files</h3>
+      <p>All official logo files live in <code>public/brand/</code>:</p>
+      <table>
+        <tr><th>File</th><th>Use it for</th></tr>
+        <tr><td><code>logo-transparent.png</code></td><td>The full "BEEF TRACE" wordmark with cow icon, background removed. Used in the Nav bar, Footer, and the loading screens.</td></tr>
+        <tr><td><code>icon-mark-transparent.png</code></td><td>Just the cow-head icon on its own, background removed. Use this anywhere space is too tight for the full wordmark.</td></tr>
+      </table>
+      <p>The favicon (browser tab icon) and the social-media preview image are generated from the same logo and live at <code>app/icon.png</code>, <code>app/apple-icon.png</code>, and <code>app/opengraph-image.png</code> — Next.js picks these up automatically, you never need to link to them manually.</p>
+
+      <h3>Brand colors</h3>
+      <p>These are defined once in <code>tailwind.config.ts</code> and used by name throughout the code (e.g. <code>text-gold-soft</code>, <code>bg-charcoal</code>) — never as raw hex codes in a component. If the brand color ever needs to change, it only needs to change in that one file.</p>
+      <div class="swatch-row">
+        <div class="swatch"><div class="chip" style="background:#0B0A09"></div><div class="name">Charcoal</div><div class="hex">#0B0A09</div></div>
+        <div class="swatch"><div class="chip" style="background:#6B1418"></div><div class="name">Maroon</div><div class="hex">#6B1418</div></div>
+        <div class="swatch"><div class="chip" style="background:#D4A657"></div><div class="name">Gold</div><div class="hex">#D4A657</div></div>
+        <div class="swatch"><div class="chip" style="background:#F5EFE6"></div><div class="name">Cream</div><div class="hex">#F5EFE6</div></div>
+        <div class="swatch"><div class="chip" style="background:#2F6F4E"></div><div class="name">Emerald</div><div class="hex">#2F6F4E</div></div>
+      </div>
+
+      <h3>Fonts</h3>
+      <ul>
+        <li><strong>Archivo</strong> — headlines (the big bold text)</li>
+        <li><strong>Inter</strong> — body paragraphs</li>
+        <li><strong>IBM Plex Mono</strong> — small uppercase labels (what the code calls "eyebrow" text) and anything meant to look technical/data-like</li>
+      </ul>
+    </section>
+
+    <section class="block" id="team-page">
+      <p class="kicker">Section 06</p>
+      <h2><span class="step-num">06</span> Updating the Team page</h2>
+      <p>Everything about the team roster lives in one file: <code>lib/team-data.ts</code>. You do not need to touch any page or component to update it.</p>
+
+      <h3>To edit an existing person</h3>
+      <p>Open <code>lib/team-data.ts</code>, find their entry (each person is a block between <code>&#123;</code> and <code>&#125;</code>), and edit the text between the quote marks. For example:</p>
+      <pre><code>{
+  slug: "amanda-kimani",
+  name: "Amanda Kimani",
+  role: "Role to be added",   ← change this to their real title
+  bio: "Bio to be added.",    ← change this to a short bio
+  photo: "/team/amanda-kimani.svg",
+  linkedin: "#",              ← replace # with their real LinkedIn URL
+  ...
+}</code></pre>
+
+      <h3>To replace a placeholder photo with a real one</h3>
+      <div class="step">
+        <div class="n">1</div>
+        <div class="content">Get a real photo — a square headshot works best (roughly equal width and height).</div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div class="content">Save it into the <code>public/team/</code> folder. Name it something simple, e.g. <code>amanda-kimani.jpg</code>.</div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div class="content">In <code>lib/team-data.ts</code>, change that person's <code>photo:</code> line from the placeholder <code>.svg</code> file to your new file, e.g. <code>photo: "/team/amanda-kimani.jpg",</code></div>
+      </div>
+
+      <h3>To add a brand-new person</h3>
+      <p>Copy one whole existing entry (from the opening <code>&#123;</code> to the closing <code>&#125;,</code>), paste it as a new block in the same list, and fill in their details.</p>
+
+      <div class="callout tip">
+        <span class="label">Good to know</span>
+        <p>The search box on the Team page works automatically — it searches whatever name and role text you put in this file. You don't need to configure the search separately.</p>
+      </div>
+    </section>
+
+    <section class="block" id="contact-info">
+      <p class="kicker">Section 07</p>
+      <h2><span class="step-num">07</span> Updating contact details (email, phone, socials)</h2>
+      <p>The real email and phone number currently show up in a few places. If they ever change, all of these need updating — there's no single central file for this yet:</p>
+      <table>
+        <tr><th>What</th><th>Where to find it</th></tr>
+        <tr><td>Email &amp; phone</td><td><code>components/Footer.tsx</code> and <code>app/contact/page.tsx</code></td></tr>
+        <tr><td>Instagram / TikTok links</td><td><code>components/Nav.tsx</code>, <code>components/Footer.tsx</code>, and <code>app/contact/page.tsx</code></td></tr>
+        <tr><td>Office location on the map</td><td><code>app/contact/page.tsx</code> — search for <code>openstreetmap</code></td></tr>
+      </table>
+      <div class="callout warn">
+        <span class="label">Suggested improvement</span>
+        <p>If contact details change often, it's worth asking a developer to move these into one shared file (like <code>lib/team-data.ts</code> does for the team) so there's only one place to edit. Not done yet — flagging it here as a good future task.</p>
+      </div>
+    </section>
+
+    <section class="block" id="media">
+      <p class="kicker">Section 08</p>
+      <h2><span class="step-num">08</span> Images &amp; videos</h2>
+      <h3>Where things live</h3>
+      <div class="file-tree">
+<span class="folder">public/videos/</span>  <span class="comment">— all background/section videos + their poster (preview frame) images</span><br>
+<span class="folder">public/team/</span>     <span class="comment">— team headshots</span><br>
+<span class="folder">public/brand/</span>    <span class="comment">— logo files</span><br>
+<span class="folder">public/logos/</span>    <span class="comment">— partner logos (JHUB Africa, JKUAT)</span><br>
+      </div>
+      <h3>Rules of thumb</h3>
+      <ul>
+        <li><strong>Videos should be short</strong> (10–15 seconds) and under ~3MB — they loop, so length doesn't add value, just load time.</li>
+        <li><strong>Always add a poster image</strong> for a new video (a single preview frame, saved as a <code>.jpg</code>) — it's what shows before the video finishes loading, so visitors never see a blank box.</li>
+        <li>Photos on the site currently come from Unsplash (free, credited) — swap them for real BeefTrace photography whenever it's available, in <code>components/FieldGallery.tsx</code> and <code>lib/photos.ts</code>.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="tasks">
+      <p class="kicker">Section 09</p>
+      <h2><span class="step-num">09</span> Common tasks, step by step</h2>
+
+      <h3>"I need to change some text on the homepage"</h3>
+      <p>Open <code>app/page.tsx</code> to see which component holds that section (e.g. <code>Hero</code>, <code>Solution</code>, <code>FAQ</code>), then open that file inside <code>components/</code> and edit the text directly. Text is usually inside quote marks between <code>&lt;p&gt;</code> or <code>&lt;h1&gt;</code> tags.</p>
+
+      <h3>"I need to add a new page"</h3>
+      <div class="step"><div class="n">1</div><div class="content">Create a new folder inside <code>app/</code>, named exactly what you want the web address to be (e.g. <code>app/careers/</code>).</div></div>
+      <div class="step"><div class="n">2</div><div class="content">Inside it, create a file called <code>page.tsx</code>.</div></div>
+      <div class="step"><div class="n">3</div><div class="content">Copy the structure of an existing simple page (e.g. <code>app/about/page.tsx</code>) as a starting point — keep the <code>&lt;Nav /&gt;</code> at the top and <code>&lt;Footer /&gt;</code> at the bottom.</div></div>
+      <div class="step"><div class="n">4</div><div class="content">Add a link to it in <code>components/Nav.tsx</code> (in the <code>LINKS</code> list near the top) and in <code>components/Footer.tsx</code>.</div></div>
+
+      <h3>"I need to change a color everywhere"</h3>
+      <p>Open <code>tailwind.config.ts</code> and change the hex value for that color name. It updates everywhere that color name is used across the whole site automatically.</p>
+
+      <h3>"Something looks broken after my edit"</h3>
+      <p>Look at the terminal window where <code>npm run dev</code> is running — it will usually show a red error message with the exact file name and line number to check.</p>
+    </section>
+
+    <section class="block" id="checks">
+      <p class="kicker">Section 10</p>
+      <h2><span class="step-num">10</span> Checking your work before sharing it</h2>
+      <p>Before sending your changes to the rest of the team (or a supervisor), run:</p>
+      <pre><code>npm run build</code></pre>
+      <p>This is the same check used before every release. It will:</p>
+      <ul>
+        <li>Catch typos in code that would otherwise crash the site</li>
+        <li>Confirm every page still loads correctly</li>
+        <li>Confirm every image/video path you typed actually exists</li>
+      </ul>
+      <div class="callout tip">
+        <span class="label">If it fails</span>
+        <p>Read the first error message from the top — it names the exact file and line. Fix that one, then run <code>npm run build</code> again. Fixing the first error often makes several others disappear too.</p>
+      </div>
+    </section>
+
+    <section class="block" id="glossary">
+      <p class="kicker">Section 11</p>
+      <h2><span class="step-num">11</span> Glossary — plain-English definitions</h2>
+      <table>
+        <tr><td><strong>Component</strong></td><td>A reusable, self-contained chunk of a page (a button, a card, a whole section) saved as its own file.</td></tr>
+        <tr><td><strong>Route</strong></td><td>A web address on the site, like <code>/about</code>. In this project, routes are created automatically by the folders inside <code>app/</code>.</td></tr>
+        <tr><td><strong>Props</strong></td><td>Information passed into a component to customize it — similar to filling in blanks on a template.</td></tr>
+        <tr><td><strong>State</strong></td><td>Information a component "remembers" while someone is using the page, like whether a menu is open or closed.</td></tr>
+        <tr><td><strong>Hook (e.g. <code>useState</code>)</strong></td><td>A built-in React tool for giving a component memory or reacting to events. You'll see these at the top of most component files.</td></tr>
+        <tr><td><strong>Tailwind class</strong></td><td>A short CSS shortcut written directly in the HTML, like <code>text-gold-soft</code> or <code>rounded-2xl</code>, instead of a separate stylesheet.</td></tr>
+        <tr><td><strong>Build</strong></td><td>The process of checking and packaging the whole site so it's ready to be published online.</td></tr>
+        <tr><td><strong>Deploy</strong></td><td>Publishing the built site so it's live on the internet at a real web address.</td></tr>
+      </table>
+    </section>
+
+    <section class="block" id="help">
+      <p class="kicker">Section 12</p>
+      <h2><span class="step-num">12</span> If something breaks</h2>
+      <ol>
+        <li>Don't panic — almost everything here is easy to undo. If you're using version control (Git), you can always go back to the last working version.</li>
+        <li>Read the error message in the terminal fully before asking for help — it usually names the exact problem.</li>
+        <li>Check this guide's <a href="#tasks">Common Tasks</a> section for the specific thing you were trying to do.</li>
+        <li>If you're stuck, share the exact error message (a screenshot of the terminal is fine) with whoever set up the project — that's almost always enough for them to help quickly.</li>
+      </ol>
+    </section>
+
+  </main>
+</div>
+
+<footer class="doc-footer">
+  BeefTrace — Team Guide · Keep this file updated as the project grows.
+</footer>
+
+</body>
+</html>

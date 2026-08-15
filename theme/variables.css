@@ -1,0 +1,291 @@
+/* ==========================================================================
+   BeefTrace Design Tokens — Dual Theme
+   ==========================================================================
+   Values here MUST stay in sync with theme/tokens.ts.
+
+   Colors are stored as space-separated RGB triplets (no commas) so Tailwind
+   can append an alpha channel at build time via rgb(var(--x) / <alpha-value>)
+   — this is what makes existing utilities like bg-charcoal/60, text-cream/40,
+   border-cream/10 keep working across both themes without touching a single
+   component.
+
+   Light & dark mode both use the "Engie Designs" palette (Camel Coat, Boho,
+   Rubine, Tamarind, Italian Roast) per the brand brief: dark mode = Italian
+   Roast / Tamarind / Camel Coat, light mode = Rubine / Camel Coat / Boho,
+   with a light background + dark text in light mode and a dark background +
+   light text in dark mode. Never a flat/pure black-white inverted theme.
+   ========================================================================== */
+
+[data-theme="dark"] {
+  /* surfaces — page/section backgrounds, cards */
+  --surface: 40 11 15; /* #280B0F — Italian Roast */
+  --surface-soft: 54 19 25; /* #361319 — Tamarind */
+  --surface-raised: 83 51 51; /* #533333 — Tamarind lifted toward Camel Coat */
+
+  /* ink — text, icons, borders drawn on top of surfaces */
+  --ink: 198 179 154; /* #C6B39A — Camel Coat (light writing on dark bg) */
+  --ink-dim: 123 105 78; /* #7B694E — Boho */
+
+  /* brand */
+  --emerald: 146 127 101; /* #927F65 — Boho lifted toward Camel Coat */
+  --emerald-bright: 168 149 124; /* #A8957C */
+  --stone: 123 105 78; /* #7B694E — Boho */
+
+  /* shared utility helpers */
+  --glass-bg: 83 51 51;
+  --glass-bg-alpha: 0.55;
+  --glass-border: 198 179 154;
+  --glass-border-alpha: 0.08;
+  --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+
+  --scrollbar-thumb: #6d3a3c;
+  --scrollbar-track: #280b0f;
+  --selection-bg: #d4a657;
+  --selection-fg: #280b0f;
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  /* surfaces — Camel Coat base, never flat/pure white */
+  --surface: 198 179 154; /* #C6B39A — Camel Coat, overall background */
+  --surface-soft: 187 168 143; /* #BBA88F — alternating section bands */
+  --surface-raised: 207 190 169; /* #CFBEA9 — cards, clearly lifted off the bg */
+
+  /* ink — Tamarind for strong dark text, Boho for muted secondary text */
+  --ink: 54 19 25; /* #361319 — Tamarind (dark words on light bg) */
+  --ink-dim: 123 105 78; /* #7B694E — Boho */
+
+  /* brand — Rubine as the accent, gold unchanged */
+  --emerald: 109 58 60; /* #6D3A3C — Rubine */
+  --emerald-bright: 138 97 99; /* #8A6163 */
+  --stone: 123 105 78; /* #7B694E — Boho */
+
+  --glass-bg: 207 190 169;
+  --glass-bg-alpha: 0.55;
+  --glass-border: 54 19 25;
+  --glass-border-alpha: 0.08;
+  --glass-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+
+  --scrollbar-thumb: #6d3a3c;
+  --scrollbar-track: #c6b39a;
+  --selection-bg: #d4a657;
+  --selection-fg: #361319;
+
+  color-scheme: light;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+html {
+  background: rgb(var(--surface));
+}
+
+body {
+  background: rgb(var(--surface));
+  color: rgb(var(--ink));
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+.glass {
+  background: rgb(var(--glass-bg) / var(--glass-bg-alpha));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgb(var(--glass-border) / var(--glass-border-alpha));
+  box-shadow: var(--glass-shadow);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(
+    100deg,
+    rgb(var(--ink)) 15%,
+    #e9c783 45%,
+    #d4a657 60%,
+    rgb(var(--ink)) 85%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ==========================================================================
+   Navbar — its own frosted treatment (spec calls for a slightly different
+   blur/shadow/border than the generic .glass used on content cards).
+   ========================================================================== */
+.nav-glass {
+  background: rgb(var(--glass-bg) / var(--glass-bg-alpha));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgb(var(--glass-border) / var(--glass-border-alpha));
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+}
+[data-theme="light"] .nav-glass {
+  background: rgba(207, 190, 169, 0.55);
+  border-color: rgba(54, 19, 25, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   Hero atmosphere — dark mode keeps the original flat scrim untouched; light
+   mode gets real depth (radial Rubine glow + warm Camel Coat sweep) instead
+   of a flat pale wash.
+   ========================================================================== */
+.hero-atmosphere {
+  background: rgb(var(--surface) / 0.45);
+}
+[data-theme="light"] .hero-atmosphere {
+  background:
+    radial-gradient(circle at top left, rgba(109, 58, 60, 0.14), transparent 35%),
+    linear-gradient(120deg, #bba88f, #cfbea9);
+}
+
+/* subtle data-grid texture, light mode only — reads as "digital" without
+   competing with the footage or the headline */
+[data-theme="light"] .hero-atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image:
+    linear-gradient(rgba(54, 19, 25, 0.8) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(54, 19, 25, 0.8) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+/* ==========================================================================
+   Card definition, light mode only
+   ==========================================================================
+   Raised cards (bg-charcoal-raised/NN) get a real lift-off-the-page shadow.
+   Dark mode is untouched — on charcoal, a heavy shadow just muddies things;
+   the lighter surface tone alone is enough separation there.
+   ========================================================================== */
+[data-theme="light"] [class~="bg-charcoal-raised/40"],
+[data-theme="light"] [class~="bg-charcoal-raised/50"],
+[data-theme="light"] [class~="bg-charcoal-raised/60"],
+[data-theme="light"] [class~="bg-charcoal-raised/90"] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   Legibility boost, light mode only
+   ==========================================================================
+   The same opacity fraction reads very differently on dark-on-light vs.
+   light-on-dark — a 40%-opacity cream label is a soft, legible haze over
+   charcoal, but the same 40% of near-black ink over a warm ivory card
+   looks washed out. Rather than touching every component's opacity
+   modifier, boost the resolved alpha specifically for light mode so the
+   existing hierarchy (lower % = more secondary) is preserved but every
+   step reads clearly.
+   ========================================================================== */
+[data-theme="light"] [class~="text-cream/20"] { color: rgb(var(--ink) / 0.44); }
+[data-theme="light"] [class~="text-cream/25"] { color: rgb(var(--ink) / 0.48); }
+[data-theme="light"] [class~="text-cream/30"] { color: rgb(var(--ink) / 0.51); }
+[data-theme="light"] [class~="text-cream/35"] { color: rgb(var(--ink) / 0.54); }
+[data-theme="light"] [class~="text-cream/40"] { color: rgb(var(--ink) / 0.58); }
+[data-theme="light"] [class~="text-cream/45"] { color: rgb(var(--ink) / 0.62); }
+[data-theme="light"] [class~="text-cream/50"] { color: rgb(var(--ink) / 0.65); }
+[data-theme="light"] [class~="text-cream/55"] { color: rgb(var(--ink) / 0.68); }
+[data-theme="light"] [class~="text-cream/60"] { color: rgb(var(--ink) / 0.72); }
+[data-theme="light"] [class~="text-cream/65"] { color: rgb(var(--ink) / 0.76); }
+[data-theme="light"] [class~="text-cream/70"] { color: rgb(var(--ink) / 0.79); }
+[data-theme="light"] [class~="text-cream/75"] { color: rgb(var(--ink) / 0.82); }
+[data-theme="light"] [class~="text-cream/80"] { color: rgb(var(--ink) / 0.86); }
+[data-theme="light"] [class~="text-cream/85"] { color: rgb(var(--ink) / 0.90); }
+
+[data-theme="light"] [class~="border-cream/5"] { border-color: rgb(var(--ink) / 0.28); }
+[data-theme="light"] [class~="border-cream/10"] { border-color: rgb(var(--ink) / 0.32); }
+[data-theme="light"] [class~="border-cream/15"] { border-color: rgb(var(--ink) / 0.35); }
+[data-theme="light"] [class~="border-cream/20"] { border-color: rgb(var(--ink) / 0.38); }
+[data-theme="light"] [class~="border-cream/25"] { border-color: rgb(var(--ink) / 0.38); }
+[data-theme="light"] [class~="border-cream/30"] { border-color: rgb(var(--ink) / 0.38); }
+[data-theme="light"] [class~="border-cream/40"] { border-color: rgb(var(--ink) / 0.38); }
+[data-theme="light"] [class~="border-cream/50"] { border-color: rgb(var(--ink) / 0.38); }
+
+/* ==========================================================================
+   Gold accent text, light mode only. Gold (#D4A657) was tuned to pop against
+   a pale-ivory background — against the new Camel Coat surface it drops to
+   ~1.1:1 contrast and disappears (eyebrow labels, hero badge values like
+   "QR + Ledger"). bg-gold (solid CTA buttons) is untouched — those already
+   carry safe dark text and aren't affected by the page background. Only
+   text-gold* is redirected to a deep bronze that keeps the "gold" identity
+   but actually reads at ~4.5–5.5:1 against Camel Coat / surface-raised.
+   ========================================================================== */
+[data-theme="light"] [class~="text-gold"] { color: #5c4118; }
+[data-theme="light"] [class~="text-gold-soft"] { color: #4e3714; }
+[data-theme="light"] [class~="text-gold-dim"] { color: #6b4e1d; }
+
+[data-theme="light"] .text-gradient-gold {
+  background: linear-gradient(
+    100deg,
+    rgb(var(--ink)) 15%,
+    #4e3714 45%,
+    #5c4118 60%,
+    rgb(var(--ink)) 85%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ==========================================================================
+   Form fields, light mode only — the spec's exact warm-cream field styling,
+   applied globally so every input/textarea across the site (contact form,
+   demo form, team search) picks it up without per-file edits.
+   ========================================================================== */
+[data-theme="light"] input,
+[data-theme="light"] textarea {
+  background-color: #cfbea9;
+  border-color: #a68f74;
+}
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: rgb(var(--ink) / 0.4);
+}
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus {
+  border-color: rgb(var(--emerald)) !important;
+  box-shadow: 0 0 0 4px rgb(var(--emerald) / 0.12);
+  outline: none;
+}
+
+/* ==========================================================================
+   Social icon chips, light mode only — solid dark circle + gold glyph reads
+   as a deliberate premium chip; a hairline outline (the dark-mode treatment)
+   disappears against a warm ivory background.
+   ========================================================================== */
+[data-theme="light"] .social-icon {
+  background: #361319;
+  border-color: transparent;
+  color: #d4a657;
+}
+[data-theme="light"] .social-icon:hover {
+  background: rgb(var(--emerald));
+  color: #fff;
+}
+
+/* ==========================================================================
+   Theme switch transition
+   ==========================================================================
+   ThemeProvider adds `theme-morphing` to <html> for ~600ms around a toggle.
+   Scoped like this (rather than a permanent global transition) so it never
+   fights GSAP/Framer Motion animations the rest of the time.
+   ========================================================================== */
+.theme-morphing,
+.theme-morphing *:not(video):not(canvas) {
+  transition:
+    background-color 0.5s var(--ease-premium, ease),
+    border-color 0.5s var(--ease-premium, ease),
+    color 0.5s var(--ease-premium, ease),
+    fill 0.5s var(--ease-premium, ease),
+    stroke 0.5s var(--ease-premium, ease),
+    box-shadow 0.5s var(--ease-premium, ease) !important;
+}
