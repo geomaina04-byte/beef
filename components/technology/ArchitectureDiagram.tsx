@@ -14,6 +14,12 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Mobile browsers fire a `resize` event every time the address bar shows/hides
+// while scrolling. Combined with a pinned ScrollTrigger this used to trigger a
+// refresh/pin recalculation loop that pegged the main thread and crashed the
+// tab on lower-end phones. This is GSAP's documented fix for that class of bug.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 const LAYERS = [
   {
     icon: FaTabletScreenButton,
@@ -60,33 +66,69 @@ export default function ArchitectureDiagram() {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced || !sectionRef.current) return;
+    if (!sectionRef.current) return;
 
-    const ctx = gsap.context(() => {
-      const st = ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top top",
-        end: `+=${LAYERS.length * 90}%`,
-        scrub: 0.5,
-        pin: true,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const idx = Math.min(
-            LAYERS.length - 1,
-            Math.floor(self.progress * LAYERS.length)
-          );
-          setActive((prev) => (prev === idx ? prev : idx));
-          if (lineFillRef.current) {
-            lineFillRef.current.style.height = `${self.progress * 100}%`;
-          }
-        },
-      });
+    // The pinned, scrubbed scroll-jack below is heavy (a 540%-of-viewport
+    // pinned section) and is what was crashing the page on mobile — phone
+    // browsers recalculate pin heights constantly as their address bar
+    // resizes, which fights with the scrub. Desktop/tablet keep the full
+    // pinned effect; phones get a lightweight IntersectionObserver instead,
+    // so the layers still highlight as you scroll, without the pin.
+    const mm = gsap.matchMedia();
 
-      return () => st.kill();
-    }, sectionRef);
+    mm.add(
+      {
+        isDesktop: "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+        isMobile: "(max-width: 767px), (prefers-reduced-motion: reduce)",
+      },
+      (context) => {
+        const { isDesktop } = context.conditions as { isDesktop: boolean; isMobile: boolean };
 
-    return () => ctx.revert();
+        if (isDesktop) {
+          const st = ScrollTrigger.create({
+            trigger: sectionRef.current,
+            start: "top top",
+            end: `+=${LAYERS.length * 90}%`,
+            scrub: 0.5,
+            pin: true,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              const idx = Math.min(
+                LAYERS.length - 1,
+                Math.floor(self.progress * LAYERS.length)
+              );
+              setActive((prev) => (prev === idx ? prev : idx));
+              if (lineFillRef.current) {
+                lineFillRef.current.style.height = `${self.progress * 100}%`;
+              }
+            },
+          });
+          return () => st.kill();
+        }
+
+        // Mobile / reduced-motion fallback: no pin, no scrub. Just watch
+        // which node has scrolled into view.
+        const nodes = nodeRefs.current.filter(Boolean) as HTMLDivElement[];
+        if (nodes.length === 0) return;
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              const idx = nodes.indexOf(entry.target as HTMLDivElement);
+              if (idx !== -1) setActive(idx);
+            });
+          },
+          { threshold: 0.6 }
+        );
+        nodes.forEach((n) => observer.observe(n));
+        if (lineFillRef.current) lineFillRef.current.style.height = "100%";
+
+        return () => observer.disconnect();
+      }
+    );
+
+    return () => mm.revert();
   }, []);
 
   useEffect(() => {
