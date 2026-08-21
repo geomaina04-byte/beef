@@ -5,6 +5,26 @@ const TT = "https://tiktok.com/@beeftrace.ke";
 
 export const TEAM: TeamMember[] = [
   {
+    slug: "dr-lawrence-nderu",
+    name: "Dr. Lawrence Nderu",
+    role: "Project Lead & Supervisor",
+    department: "Project Leadership",
+    bio: "Dr. Lawrence Nderu serves as the Project Lead and Supervisor for BeefTrace, providing academic guidance, technical direction, and oversight throughout the development and implementation of the project.",
+    photo: "/team/Nderu.jpg",
+    linkedin: "#",
+    instagram: IG,
+    tiktok: TT,
+    expertise: [
+      "Project Supervision",
+      "Academic Leadership",
+      "Technical Guidance",
+      "Project Management",
+    ],
+    years: 0,
+    projects: [],
+  },
+
+  {
     slug: "amanda-kimani",
     name: "Amanda Kimani",
     role: "Team Lead & UI/UX Designer",
