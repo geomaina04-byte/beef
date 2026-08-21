@@ -23,12 +23,30 @@ export default function NetworkCanvas() {
     let height = 0;
     let nodes: Node[] = [];
     let raf = 0;
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     function resize() {
       const rect = canvas!.getBoundingClientRect();
-      width = rect.width;
-      height = rect.height;
+      const newWidth = rect.width;
+      const newHeight = rect.height;
+
+      // Mobile browsers fire `resize` repeatedly while scrolling as the
+      // address bar shows/hides — that only changes height, not width.
+      // Re-running this on every one of those events (re-allocating the
+      // canvas backing store + re-randomizing every node) was a big part
+      // of what made the Technology page janky/crash-prone on phones, so
+      // skip the rebuild when only the height moved a little.
+      if (
+        width &&
+        newWidth === width &&
+        Math.abs(newHeight - height) < 120
+      ) {
+        return;
+      }
+
+      width = newWidth;
+      height = newHeight;
       canvas!.width = width * dpr;
       canvas!.height = height * dpr;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -40,6 +58,11 @@ export default function NetworkCanvas() {
         vx: (Math.random() - 0.5) * 0.18,
         vy: (Math.random() - 0.5) * 0.18,
       }));
+    }
+
+    function debouncedResize() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 150);
     }
 
     function draw() {
@@ -86,9 +109,10 @@ export default function NetworkCanvas() {
 
     resize();
     draw();
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", debouncedResize);
     return () => {
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", debouncedResize);
+      clearTimeout(resizeTimer);
       cancelAnimationFrame(raf);
     };
   }, []);
