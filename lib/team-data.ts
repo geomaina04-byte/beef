@@ -10,7 +10,7 @@ export const TEAM: TeamMember[] = [
     role: "Project Lead & Supervisor",
     department: "Project Leadership",
     bio: "Dr. Lawrence Nderu serves as the Project Lead and Supervisor for BeefTrace, providing academic guidance, technical direction, and oversight throughout the development and implementation of the project.",
-    photo: "/team/Nderu.jpg",
+    photo: "/team/nderu.jpg",
     linkedin: "#",
     instagram: IG,
     tiktok: TT,
