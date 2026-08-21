@@ -1,218 +1,82 @@
 "use client";
 
-import { useRef } from "react";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import {
-  FaLinkedin,
-  FaTiktok,
-  FaInstagram,
-  FaEnvelope,
-} from "react-icons/fa6";
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
+import ProfileCard from "@/components/team/ProfileCard";
+import { TEAM } from "@/lib/team-data";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 
-export interface TeamMember {
-  slug: string;
-  name: string;
-  role: string;
-  bio: string;
-  photo: string;
+export default function TeamPage() {
+  const [query, setQuery] = useState("");
 
-  linkedin?: string;
-  email?: string;
-  instagram?: string;
-  tiktok?: string;
-
-  expertise: string[];
-  years: number;
-  projects: string[];
-  department: string;
-
-  // Optional academic/institutional information
-  affiliation?: string;
-  isSupervisor?: boolean;
-}
-
-export default function ProfileCard({
-  member,
-}: {
-  member: TeamMember;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const rotateX = useSpring(
-    useTransform(y, [-0.5, 0.5], [8, -8]),
-    {
-      stiffness: 200,
-      damping: 20,
-    }
-  );
-
-  const rotateY = useSpring(
-    useTransform(x, [-0.5, 0.5], [-8, 8]),
-    {
-      stiffness: 200,
-      damping: 20,
-    }
-  );
-
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = ref.current?.getBoundingClientRect();
-
-    if (!rect) return;
-
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  }
-
-  function handleMouseLeave() {
-    x.set(0);
-    y.set(0);
-  }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return TEAM;
+    return TEAM.filter((m) => m.name.toLowerCase().includes(q) || m.role.toLowerCase().includes(q));
+  }, [query]);
 
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformPerspective: 800,
-      }}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{
-        once: true,
-        margin: "-40px",
-      }}
-      transition={{
-        duration: 0.5,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className={`group relative rounded-3xl border p-6 backdrop-blur-xl transition-colors duration-300 ${
-        member.isSupervisor
-          ? "border-gold/30 bg-gold/5"
-          : "border-cream/10 bg-charcoal-raised/60"
-      } hover:border-gold/40`}
-    >
-      {/* Border glow */}
-      <div
-        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          boxShadow: "0 0 40px 4px rgba(212,166,87,0.12)",
-        }}
-      />
+    <main className="relative">
+      <Nav />
 
-      {/* Supervisor badge */}
-      {member.isSupervisor && (
-        <div className="relative mb-5">
-          <span className="inline-flex items-center rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-gold-soft">
-            Project Leadership
-          </span>
-        </div>
-      )}
-
-      {/* Profile header */}
-      <div className="relative flex items-center gap-4">
-        <img
-          src={member.photo}
-          alt={member.name}
-          className={`h-24 w-24 shrink-0 object-cover ${
-            member.isSupervisor
-              ? "rounded-2xl ring-2 ring-gold/30"
-              : "rounded-2xl"
-          }`}
-        />
-
-        <div>
-          <p className="font-display text-lg font-700 text-cream">
-            {member.name}
+      <section
+        className="relative overflow-hidden bg-cover bg-center pt-40 pb-16"
+        style={{ backgroundImage: "url('/team/team.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-charcoal/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/35 via-charcoal/65 to-charcoal" />
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="container-lux relative"
+        >
+          <p className="eyebrow mb-4 text-emerald-bright">The people behind it</p>
+          <h1 className="max-w-2xl font-display text-5xl font-800 leading-tight text-cream md:text-6xl">
+            Built by a small team <span className="text-gradient-gold">obsessed with the field.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-sm text-cream/45">
+            Roles, bios, and photos are being finalized — names below are the
+            real BeefTrace team.
           </p>
+        </motion.div>
+      </section>
 
-          <p className="text-xs font-semibold text-emerald">
-            {member.role}
-          </p>
+      <section className="section-pad pt-0">
+        <div className="container-lux">
+          <div className="mb-10">
+            <div className="relative w-full max-w-xs">
+              <FaMagnifyingGlass className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-cream/30" size={13} />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by name…"
+                className="w-full rounded-full border border-cream/10 bg-charcoal-raised/50 py-2.5 pl-10 pr-4 text-sm text-cream placeholder:text-cream/30 focus:border-gold/40 focus:outline-none"
+              />
+            </div>
+          </div>
 
-          {member.affiliation && (
-            <p className="mt-1 text-[11px] font-medium text-gold-soft/80">
-              {member.affiliation}
-            </p>
-          )}
-
-          {member.years > 0 && (
-            <p className="mt-0.5 text-[11px] text-cream/35">
-              {member.years} yrs experience
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Bio */}
-      <p className="relative mt-4 text-sm leading-relaxed text-cream/50">
-        {member.bio}
-      </p>
-
-      {/* Expertise */}
-      {member.expertise.length > 0 && (
-        <div className="relative mt-4 flex flex-wrap gap-1.5">
-          {member.expertise.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-cream/10 px-2.5 py-1 text-[10px] text-cream/50"
+          {filtered.length === 0 ? (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="py-20 text-center text-sm text-cream/35"
             >
-              {tag}
-            </span>
-          ))}
+              No one matches that search.
+            </motion.p>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((m) => (
+                <ProfileCard key={m.slug} member={m} />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </section>
 
-      {/* Social links */}
-      <div className="relative mt-5 flex items-center gap-3 border-t border-cream/5 pt-4">
-        <a
-          href={member.linkedin || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${member.name} on LinkedIn`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-colors hover:border-gold/40 hover:text-gold-soft"
-        >
-          <FaLinkedin size={13} />
-        </a>
-
-        <a
-          href={member.email ? `mailto:${member.email}` : "#"}
-          aria-label={`Email ${member.name}`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-colors hover:border-gold/40 hover:text-gold-soft"
-        >
-          <FaEnvelope size={12} />
-        </a>
-
-        <a
-          href={member.instagram || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${member.name} on Instagram`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-colors hover:border-gold/40 hover:text-gold-soft"
-        >
-          <FaInstagram size={13} />
-        </a>
-
-        <a
-          href={member.tiktok || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${member.name} on TikTok`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-colors hover:border-gold/40 hover:text-gold-soft"
-        >
-          <FaTiktok size={12} />
-        </a>
-      </div>
-    </motion.div>
+      <Footer />
+    </main>
   );
 }
